@@ -3,17 +3,16 @@
 
 data "aws_caller_identity" "current" {}
 
-resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+# Use existing OIDC provider if it already exists, otherwise create one
+data "aws_iam_openid_connect_provider" "github_existing" {
+  url = "https://token.actions.githubusercontent.com"
+}
 
-  tags = {
-    Name = "github-actions-oidc"
-  }
+locals {
+  oidc_provider_arn = data.aws_iam_openid_connect_provider.github_existing.arn
 }
 
 output "oidc_provider_arn" {
   description = "ARN of the GitHub OIDC provider"
-  value       = aws_iam_openid_connect_provider.github.arn
+  value       = local.oidc_provider_arn
 }
