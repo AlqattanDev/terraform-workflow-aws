@@ -36,6 +36,7 @@ provider "aws" {
   }
 }
 
+# Get latest Amazon Linux 2023 AMI
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -51,15 +52,102 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
+# Get default VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Get default subnets
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+# Security group for the instance
+resource "aws_security_group" "main" {
+  name        = "${INSTANCE_NAME}-sg"
+  description = "Security group for ${INSTANCE_NAME}"
+  vpc_id      = data.aws_vpc.default.id
+
+  # SSH access (customize as needed)
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "SSH access"
+  }
+
+  # HTTP access
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP access"
+  }
+
+  # HTTPS access
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS access"
+  }
+
+  # All outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "All outbound traffic"
+  }
+
+  tags = {
+    Name = "${INSTANCE_NAME}-sg"
+  }
+}
+
+# EC2 Instance
 resource "aws_instance" "main" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = "${INSTANCE_TYPE}"
+  subnet_id     = data.aws_subnets.default.ids[0]
+
+  vpc_security_group_ids = [aws_security_group.main.id]
+
+  # Root volume with customizable size
+  root_block_device {
+    volume_size           = ${STORAGE_SIZE}
+    volume_type           = "gp3"
+    encrypted             = true
+    delete_on_termination = true
+
+    tags = {
+      Name = "${INSTANCE_NAME}-root"
+    }
+  }
+
+  # Enable detailed monitoring if production
+  monitoring = "${ENVIRONMENT}" == "production" ? true : false
+
+  # User data script for initial setup
+  user_data = <<-EOF
+    #!/bin/bash
+    yum update -y
+    echo "Instance provisioned for ticket ${TICKET_ID}" > /var/log/provision.log
+  EOF
 
   tags = {
     Name = "${INSTANCE_NAME}"
   }
 }
 
+# Outputs
 output "instance_id" {
   description = "ID of the created EC2 instance"
   value       = aws_instance.main.id
@@ -73,6 +161,21 @@ output "instance_public_ip" {
 output "instance_private_ip" {
   description = "Private IP of the created EC2 instance"
   value       = aws_instance.main.private_ip
+}
+
+output "instance_type" {
+  description = "Instance type"
+  value       = aws_instance.main.instance_type
+}
+
+output "storage_size_gb" {
+  description = "Root volume size in GB"
+  value       = ${STORAGE_SIZE}
+}
+
+output "security_group_id" {
+  description = "Security group ID"
+  value       = aws_security_group.main.id
 }
 
 output "ticket_id" {

@@ -51,6 +51,11 @@ on:
         required: false
         type: string
         default: 't3.micro'
+      storage_size:
+        description: 'Storage size in GB (for EC2 instances)'
+        required: false
+        type: string
+        default: '30'
 
 permissions:
   contents: write
@@ -91,7 +96,8 @@ jobs:
             sed "s/\${BUCKET_NAME}/${{ inputs.resource_name }}/g" | \
             sed "s/\${VERSIONING_ENABLED}/${{ inputs.versioning_enabled }}/g" | \
             sed "s/\${INSTANCE_NAME}/${{ inputs.resource_name }}/g" | \
-            sed "s/\${INSTANCE_TYPE}/${{ inputs.instance_type }}/g" \
+            sed "s/\${INSTANCE_TYPE}/${{ inputs.instance_type }}/g" | \
+            sed "s/\${STORAGE_SIZE}/${{ inputs.storage_size }}/g" \
             > "$TICKET_DIR/main.tf"
 
           # Create request metadata file
@@ -103,6 +109,9 @@ jobs:
             "environment": "${{ inputs.environment }}",
             "aws_region": "${{ inputs.aws_region }}",
             "requested_by": "${{ inputs.requested_by }}",
+            "instance_type": "${{ inputs.instance_type }}",
+            "storage_size_gb": "${{ inputs.storage_size }}",
+            "versioning_enabled": "${{ inputs.versioning_enabled }}",
             "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "status": "pending_review"
           }
@@ -128,6 +137,8 @@ jobs:
             | Environment | `${{ inputs.environment }}` |
             | AWS Region | `${{ inputs.aws_region }}` |
             | Requested By | ${{ inputs.requested_by }} |
+            | Instance Type | `${{ inputs.instance_type }}` |
+            | Storage Size | `${{ inputs.storage_size }} GB` |
 
             ### Workflow
             1. Review the generated Terraform code below
