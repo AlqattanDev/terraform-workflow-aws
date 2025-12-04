@@ -1,0 +1,35 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: terraform-workflow-aws
+  title: Terraform AWS Workflow
+  description: Automated infrastructure provisioning workflow that integrates ServiceNow requests with AWS deployments via GitHub Actions
+  annotations:
+    github.com/project-slug: AlqattanDev/terraform-workflow-aws
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - terraform
+    - aws
+    - infrastructure
+    - github-actions
+  links:
+    - url: https://github.com/AlqattanDev/terraform-workflow-aws/actions
+      title: GitHub Actions
+      icon: github
+    - url: https://github.com/AlqattanDev/terraform-workflow-aws/pulls
+      title: Pull Requests
+      icon: github
+spec:
+  type: service
+  lifecycle: production
+  owner: user:guest
+  system: infrastructure
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: infrastructure
+  title: Infrastructure Platform
+  description: Self-service infrastructure provisioning system
+spec:
+  owner: user:guest
