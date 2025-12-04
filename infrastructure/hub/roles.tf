@@ -78,47 +78,11 @@ resource "aws_iam_role_policy" "terraform_state_access" {
 
 # Policy for provisioning AWS resources (simplified for common resources)
 data "aws_iam_policy_document" "terraform_provisioning" {
-  # S3 bucket management
+  # S3 bucket management - full permissions for Terraform
   statement {
     effect = "Allow"
     actions = [
-      "s3:CreateBucket",
-      "s3:DeleteBucket",
-      "s3:GetBucketAcl",
-      "s3:GetBucketCORS",
-      "s3:GetBucketLocation",
-      "s3:GetBucketLogging",
-      "s3:GetBucketPolicy",
-      "s3:GetBucketTagging",
-      "s3:GetBucketVersioning",
-      "s3:GetBucketWebsite",
-      "s3:GetEncryptionConfiguration",
-      "s3:GetLifecycleConfiguration",
-      "s3:GetObject",
-      "s3:GetObjectAcl",
-      "s3:GetObjectTagging",
-      "s3:GetReplicationConfiguration",
-      "s3:ListBucket",
-      "s3:PutBucketAcl",
-      "s3:PutBucketCORS",
-      "s3:PutBucketLogging",
-      "s3:PutBucketPolicy",
-      "s3:PutBucketTagging",
-      "s3:PutBucketVersioning",
-      "s3:PutBucketWebsite",
-      "s3:PutEncryptionConfiguration",
-      "s3:PutLifecycleConfiguration",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:PutObjectTagging",
-      "s3:PutReplicationConfiguration",
-      "s3:DeleteObject",
-      "s3:GetBucketPublicAccessBlock",
-      "s3:PutBucketPublicAccessBlock",
-      "s3:GetBucketOwnershipControls",
-      "s3:PutBucketOwnershipControls",
-      "s3:GetAccelerateConfiguration",
-      "s3:PutAccelerateConfiguration"
+      "s3:*"
     ]
     resources = ["*"]
   }
