@@ -1,0 +1,81 @@
+# EC2 Instance Template
+# Generated for ticket: ${TICKET_ID}
+# Requested by: ${REQUESTED_BY}
+# Created: ${CREATED_DATE}
+
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "terraform-workflow-state-414483036967"
+    key            = "requests/${TICKET_ID}/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-state-locks"
+    encrypt        = true
+  }
+}
+
+provider "aws" {
+  region = "${AWS_REGION}"
+
+  default_tags {
+    tags = {
+      Project      = "terraform-workflow-aws"
+      ManagedBy    = "terraform"
+      TicketID     = "${TICKET_ID}"
+      RequestedBy  = "${REQUESTED_BY}"
+      Environment  = "${ENVIRONMENT}"
+    }
+  }
+}
+
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_instance" "main" {
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = "${INSTANCE_TYPE}"
+
+  tags = {
+    Name = "${INSTANCE_NAME}"
+  }
+}
+
+output "instance_id" {
+  description = "ID of the created EC2 instance"
+  value       = aws_instance.main.id
+}
+
+output "instance_public_ip" {
+  description = "Public IP of the created EC2 instance"
+  value       = aws_instance.main.public_ip
+}
+
+output "instance_private_ip" {
+  description = "Private IP of the created EC2 instance"
+  value       = aws_instance.main.private_ip
+}
+
+output "ticket_id" {
+  description = "ServiceNow ticket ID"
+  value       = "${TICKET_ID}"
+}

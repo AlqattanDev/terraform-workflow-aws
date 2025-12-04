@@ -1,0 +1,144 @@
+name: Process ServiceNow Request
+
+on:
+  # Trigger via API call with request data
+  workflow_dispatch:
+    inputs:
+      ticket_id:
+        description: 'ServiceNow Ticket ID (e.g., REQ0012345)'
+        required: true
+        type: string
+      resource_type:
+        description: 'Type of resource to create'
+        required: true
+        type: choice
+        options:
+          - s3-bucket
+          - ec2-instance
+      resource_name:
+        description: 'Name for the resource'
+        required: true
+        type: string
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      aws_region:
+        description: 'AWS Region'
+        required: true
+        type: choice
+        options:
+          - us-east-1
+          - us-west-2
+          - eu-west-1
+      requested_by:
+        description: 'Email of the requester'
+        required: true
+        type: string
+      # S3 specific
+      versioning_enabled:
+        description: 'Enable S3 versioning (for S3 buckets)'
+        required: false
+        type: boolean
+        default: true
+      # EC2 specific
+      instance_type:
+        description: 'EC2 instance type (for EC2 instances)'
+        required: false
+        type: string
+        default: 't3.micro'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create ticket directory
+        run: |
+          mkdir -p "requests/in-progress/${{ inputs.ticket_id }}"
+
+      - name: Generate Terraform configuration
+        run: |
+          TICKET_DIR="requests/in-progress/${{ inputs.ticket_id }}"
+          TEMPLATE_FILE=""
+
+          case "${{ inputs.resource_type }}" in
+            "s3-bucket")
+              TEMPLATE_FILE="templates/s3-bucket.tf.tmpl"
+              ;;
+            "ec2-instance")
+              TEMPLATE_FILE="templates/ec2-instance.tf.tmpl"
+              ;;
+          esac
+
+          # Read template and substitute variables
+          cat "$TEMPLATE_FILE" | \
+            sed "s/\${TICKET_ID}/${{ inputs.ticket_id }}/g" | \
+            sed "s/\${REQUESTED_BY}/${{ inputs.requested_by }}/g" | \
+            sed "s/\${CREATED_DATE}/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g" | \
+            sed "s/\${AWS_REGION}/${{ inputs.aws_region }}/g" | \
+            sed "s/\${ENVIRONMENT}/${{ inputs.environment }}/g" | \
+            sed "s/\${BUCKET_NAME}/${{ inputs.resource_name }}/g" | \
+            sed "s/\${VERSIONING_ENABLED}/${{ inputs.versioning_enabled }}/g" | \
+            sed "s/\${INSTANCE_NAME}/${{ inputs.resource_name }}/g" | \
+            sed "s/\${INSTANCE_TYPE}/${{ inputs.instance_type }}/g" \
+            > "$TICKET_DIR/main.tf"
+
+          # Create request metadata file
+          cat > "$TICKET_DIR/request.json" << EOF
+          {
+            "ticket_id": "${{ inputs.ticket_id }}",
+            "resource_type": "${{ inputs.resource_type }}",
+            "resource_name": "${{ inputs.resource_name }}",
+            "environment": "${{ inputs.environment }}",
+            "aws_region": "${{ inputs.aws_region }}",
+            "requested_by": "${{ inputs.requested_by }}",
+            "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "status": "pending_review"
+          }
+          EOF
+
+          echo "Generated Terraform configuration for ${{ inputs.ticket_id }}"
+          cat "$TICKET_DIR/main.tf"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat: Infrastructure request ${{ inputs.ticket_id }}"
+          title: "[${{ inputs.ticket_id }}] ${{ inputs.resource_type }} - ${{ inputs.resource_name }}"
+          body: |
+            ## ServiceNow Request: ${{ inputs.ticket_id }}
+
+            ### Request Details
+            | Field | Value |
+            |-------|-------|
+            | Resource Type | `${{ inputs.resource_type }}` |
+            | Resource Name | `${{ inputs.resource_name }}` |
+            | Environment | `${{ inputs.environment }}` |
+            | AWS Region | `${{ inputs.aws_region }}` |
+            | Requested By | ${{ inputs.requested_by }} |
+
+            ### Workflow
+            1. Review the generated Terraform code below
+            2. Approve and merge this PR to deploy
+            3. Resources will be created automatically on merge
+
+            ---
+            *This PR was automatically generated from ServiceNow ticket ${{ inputs.ticket_id }}*
+          branch: "request/${{ inputs.ticket_id }}"
+          base: main
+          labels: |
+            infrastructure
+            automated
+            ${{ inputs.environment }}

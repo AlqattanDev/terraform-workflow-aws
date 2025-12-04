@@ -1,0 +1,133 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    paths:
+      - 'requests/in-progress/**/*.tf'
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::414483036967:role/GitHubActionsExecutor
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Find changed request directories
+        id: changes
+        run: |
+          # Find all directories with .tf files that were changed
+          CHANGED_DIRS=$(git diff --name-only origin/main...HEAD | \
+            grep -E '^requests/in-progress/.*/.*\.tf$' | \
+            xargs -I {} dirname {} | \
+            sort -u)
+
+          if [ -z "$CHANGED_DIRS" ]; then
+            echo "No Terraform changes found"
+            echo "dirs=" >> $GITHUB_OUTPUT
+          else
+            echo "Found changed directories:"
+            echo "$CHANGED_DIRS"
+            # Convert to JSON array for matrix
+            DIRS_JSON=$(echo "$CHANGED_DIRS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            echo "dirs=$DIRS_JSON" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Init and Plan
+        id: plan
+        run: |
+          PLAN_OUTPUT=""
+
+          for dir in $(echo '${{ steps.changes.outputs.dirs }}' | jq -r '.[]'); do
+            echo "Processing: $dir"
+            cd "$dir"
+
+            # Extract ticket ID from path
+            TICKET_ID=$(basename "$dir")
+
+            echo "### Terraform Plan for $TICKET_ID" >> $GITHUB_STEP_SUMMARY
+
+            terraform init -input=false
+
+            PLAN_RESULT=$(terraform plan -no-color -input=false 2>&1) || true
+
+            PLAN_OUTPUT="$PLAN_OUTPUT
+
+            <details>
+            <summary>Terraform Plan: $TICKET_ID</summary>
+
+            \`\`\`hcl
+            $PLAN_RESULT
+            \`\`\`
+
+            </details>
+            "
+
+            cd - > /dev/null
+          done
+
+          # Save plan output for PR comment
+          echo "plan_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$PLAN_OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with Plan
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const planOutput = `${{ steps.plan.outputs.plan_output }}`;
+
+            const body = `## Terraform Plan Results
+
+            ${planOutput}
+
+            ---
+            *Merge this PR to apply the infrastructure changes.*
+            `;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## Terraform Plan Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
