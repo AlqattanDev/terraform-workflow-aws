@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0066cc"/>
+      <stop offset="100%" style="stop-color:#004d99"/>
+    </linearGradient>
+    <linearGradient id="awsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9900"/>
+      <stop offset="100%" style="stop-color:#FF6600"/>
+    </linearGradient>
+    <linearGradient id="githubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#24292e"/>
+      <stop offset="100%" style="stop-color:#1a1e22"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="600" fill="#f8f9fa"/>
+
+  <!-- Title -->
+  <text x="500" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#343a40">
+    Infrastructure Request Workflow
+  </text>
+  <text x="500" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">
+    Self-Service Cloud Provisioning with GitOps
+  </text>
+
+  <!-- Step 1: User/Portal -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="120" width="160" height="100" rx="10" fill="white" stroke="#0066cc" stroke-width="2"/>
+    <circle cx="130" cy="155" r="20" fill="#e3f2fd"/>
+    <text x="130" y="160" text-anchor="middle" font-size="20">👤</text>
+    <text x="130" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#343a40">Self-Service Portal</text>
+    <text x="130" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">Submit Request</text>
+  </g>
+  <text x="130" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#0066cc">1. REQUEST</text>
+
+  <!-- Arrow 1 -->
+  <path d="M 210 170 L 270 170" stroke="#0066cc" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0066cc"/>
+    </marker>
+  </defs>
+
+  <!-- Step 2: GitHub Actions -->
+  <g filter="url(#shadow)">
+    <rect x="280" y="120" width="160" height="100" rx="10" fill="url(#githubGrad)"/>
+    <text x="360" y="160" text-anchor="middle" font-size="24">⚙️</text>
+    <text x="360" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">GitHub Actions</text>
+    <text x="360" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#adb5bd">Generate Terraform</text>
+    <text x="360" y="213" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#adb5bd">Create PR</text>
+  </g>
+  <text x="360" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#24292e">2. GENERATE</text>
+
+  <!-- Arrow 2 -->
+  <path d="M 440 170 L 500 170" stroke="#24292e" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+  <defs>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#24292e"/>
+    </marker>
+  </defs>
+
+  <!-- Step 3: Pull Request -->
+  <g filter="url(#shadow)">
+    <rect x="510" y="120" width="160" height="100" rx="10" fill="white" stroke="#28a745" stroke-width="2"/>
+    <text x="590" y="160" text-anchor="middle" font-size="24">📝</text>
+    <text x="590" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#343a40">Pull Request</text>
+    <text x="590" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">Review &amp; Approve</text>
+    <text x="590" y="213" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">Terraform Plan</text>
+  </g>
+  <text x="590" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#28a745">3. REVIEW</text>
+
+  <!-- Arrow 3 -->
+  <path d="M 670 170 L 730 170" stroke="#28a745" stroke-width="2" fill="none" marker-end="url(#arrowhead3)"/>
+  <defs>
+    <marker id="arrowhead3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#28a745"/>
+    </marker>
+  </defs>
+
+  <!-- Step 4: Terraform Apply -->
+  <g filter="url(#shadow)">
+    <rect x="740" y="120" width="160" height="100" rx="10" fill="white" stroke="#7b42bc" stroke-width="2"/>
+    <text x="820" y="160" text-anchor="middle" font-size="24">🔧</text>
+    <text x="820" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#343a40">Terraform Apply</text>
+    <text x="820" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">On PR Merge</text>
+    <text x="820" y="213" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">Auto-deploy</text>
+  </g>
+  <text x="820" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#7b42bc">4. DEPLOY</text>
+
+  <!-- Arrow down to AWS -->
+  <path d="M 820 220 L 820 280" stroke="#FF9900" stroke-width="2" fill="none" marker-end="url(#arrowhead4)"/>
+  <defs>
+    <marker id="arrowhead4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#FF9900"/>
+    </marker>
+  </defs>
+
+  <!-- AWS Cloud Box -->
+  <g filter="url(#shadow)">
+    <rect x="500" y="290" width="450" height="180" rx="15" fill="white" stroke="#FF9900" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="725" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FF9900">AWS Cloud</text>
+  </g>
+
+  <!-- S3 Bucket -->
+  <g filter="url(#shadow)">
+    <rect x="530" y="340" width="120" height="80" rx="8" fill="url(#awsGrad)"/>
+    <text x="590" y="375" text-anchor="middle" font-size="24">🪣</text>
+    <text x="590" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">S3 Bucket</text>
+  </g>
+
+  <!-- EC2 Instance -->
+  <g filter="url(#shadow)">
+    <rect x="665" y="340" width="120" height="80" rx="8" fill="url(#awsGrad)"/>
+    <text x="725" y="375" text-anchor="middle" font-size="24">🖥️</text>
+    <text x="725" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">EC2 Instance</text>
+  </g>
+
+  <!-- More Resources -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="340" width="120" height="80" rx="8" fill="#ddd" stroke="#999" stroke-width="1" stroke-dasharray="3,2"/>
+    <text x="860" y="375" text-anchor="middle" font-size="24">➕</text>
+    <text x="860" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#666">More Resources</text>
+  </g>
+
+  <!-- Request Status Flow -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="320" width="380" height="150" rx="10" fill="white" stroke="#dee2e6" stroke-width="1"/>
+    <text x="240" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#343a40">Request Lifecycle Tracking</text>
+
+    <!-- Status boxes -->
+    <rect x="70" y="360" width="75" height="35" rx="5" fill="#fff3cd"/>
+    <text x="107" y="382" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#856404">pending/</text>
+
+    <text x="155" y="378" font-size="14">→</text>
+
+    <rect x="170" y="360" width="85" height="35" rx="5" fill="#cce5ff"/>
+    <text x="212" y="382" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#004085">in-progress/</text>
+
+    <text x="265" y="378" font-size="14">→</text>
+
+    <rect x="280" y="360" width="70" height="35" rx="5" fill="#d4edda"/>
+    <text x="315" y="382" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#155724">deployed/</text>
+
+    <text x="355" y="378" font-size="12" fill="#6c757d">or</text>
+
+    <rect x="365" y="360" width="55" height="35" rx="5" fill="#f8d7da"/>
+    <text x="392" y="382" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#721c24">failed/</text>
+
+    <!-- Folder icon -->
+    <text x="70" y="440" font-size="12">📁</text>
+    <text x="90" y="440" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">Each ticket gets its own folder with Terraform config &amp; metadata</text>
+  </g>
+
+  <!-- Security Note -->
+  <g>
+    <rect x="50" y="510" width="900" height="60" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="1"/>
+    <text x="80" y="535" font-size="18">🔒</text>
+    <text x="105" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2e7d32">Security Features:</text>
+    <text x="230" y="535" font-family="Arial, sans-serif" font-size="11" fill="#1b5e20">OIDC Authentication (no stored credentials)</text>
+    <text x="230" y="552" font-family="Arial, sans-serif" font-size="11" fill="#1b5e20">• PR-based approval workflow • Encrypted state storage • Full audit trail via Git</text>
+  </g>
+</svg>
