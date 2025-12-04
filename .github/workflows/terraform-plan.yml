@@ -98,22 +98,31 @@ jobs:
           echo "$PLAN_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Write plan to file
+        run: |
+          mkdir -p /tmp/plan
+          echo "${{ steps.plan.outputs.plan_output }}" > /tmp/plan/output.md
+
       - name: Comment PR with Plan
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
         with:
           script: |
-            const planOutput = `${{ steps.plan.outputs.plan_output }}`;
+            const fs = require('fs');
+            let planOutput = '';
+            try {
+              planOutput = fs.readFileSync('/tmp/plan/output.md', 'utf8');
+            } catch (e) {
+              planOutput = 'No plan output available';
+            }
 
             const body = `## Terraform Plan Results
 
-            ${planOutput}
+${planOutput}
 
-            ---
-            *Merge this PR to apply the infrastructure changes.*
-            `;
+---
+*Merge this PR to apply the infrastructure changes.*`;
 
-            // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
