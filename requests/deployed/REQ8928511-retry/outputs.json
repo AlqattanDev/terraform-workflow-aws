@@ -1,0 +1,37 @@
+{
+  "instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "i-035f72aadbb77f6af"
+  },
+  "instance_private_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "172.31.4.228"
+  },
+  "instance_public_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "34.243.160.237"
+  },
+  "instance_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "t3.small"
+  },
+  "security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-031d8e6a7bc7d7ea8"
+  },
+  "storage_size_gb": {
+    "sensitive": false,
+    "type": "number",
+    "value": 30
+  },
+  "ticket_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "REQ8928511-retry"
+  }
+}
