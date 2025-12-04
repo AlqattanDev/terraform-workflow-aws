@@ -1,0 +1,17 @@
+{
+  "bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::test-final-success-414483036967"
+  },
+  "bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "test-final-success-414483036967"
+  },
+  "ticket_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "REQ0000003"
+  }
+}
