@@ -19,6 +19,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Fetch base branch
+        run: git fetch origin main:main
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -35,7 +41,10 @@ jobs:
         id: changes
         run: |
           # Find all directories with .tf files that were changed
-          CHANGED_DIRS=$(git diff --name-only origin/main...HEAD | \
+          echo "Comparing main to HEAD..."
+          git log --oneline main..HEAD | head -5
+
+          CHANGED_DIRS=$(git diff --name-only main...HEAD | \
             grep -E '^requests/in-progress/.*/.*\.tf$' | \
             xargs -I {} dirname {} | \
             sort -u)
