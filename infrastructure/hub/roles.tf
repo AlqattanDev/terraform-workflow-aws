@@ -116,7 +116,9 @@ data "aws_iam_policy_document" "terraform_provisioning" {
       "s3:GetBucketPublicAccessBlock",
       "s3:PutBucketPublicAccessBlock",
       "s3:GetBucketOwnershipControls",
-      "s3:PutBucketOwnershipControls"
+      "s3:PutBucketOwnershipControls",
+      "s3:GetAccelerateConfiguration",
+      "s3:PutAccelerateConfiguration"
     ]
     resources = ["*"]
   }
