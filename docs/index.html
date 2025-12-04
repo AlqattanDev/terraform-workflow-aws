@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infrastructure Request Portal</title>
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004d99;
+            --success: #28a745;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--gray-100);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .header .subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+        }
+
+        .form-label .required {
+            color: var(--danger);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .config-section {
+            background: var(--gray-100);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-section .form-label {
+            font-size: 0.875rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .ticket-number {
+            font-family: monospace;
+            font-size: 1.25rem;
+            background: var(--gray-100);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .resource-options {
+            display: none;
+        }
+
+        .resource-options.active {
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Infrastructure Request Portal</h1>
+        <p class="subtitle">Self-Service Cloud Resource Provisioning</p>
+    </header>
+
+    <div class="container">
+        <!-- Configuration Section -->
+        <div class="card config-section">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">GitHub Personal Access Token</label>
+                <input type="password" id="github-token" class="form-input" placeholder="ghp_xxxxxxxxxxxx">
+                <p class="form-help">Required to trigger workflows. Token needs 'repo' and 'workflow' scopes. <a href="https://github.com/settings/tokens/new?scopes=repo,workflow" target="_blank">Create token</a></p>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alert-container"></div>
+
+        <!-- Request Form -->
+        <div class="card">
+            <h2 class="card-title">New Infrastructure Request</h2>
+
+            <form id="request-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ticket ID <span class="required">*</span></label>
+                        <input type="text" id="ticket-id" class="form-input" value="" placeholder="REQ0000001" required>
+                        <p class="form-help">Auto-generated or enter custom ID</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Requester Email <span class="required">*</span></label>
+                        <input type="email" id="requested-by" class="form-input" placeholder="user@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Resource Type <span class="required">*</span></label>
+                    <select id="resource-type" class="form-select" required>
+                        <option value="">Select a resource type...</option>
+                        <option value="s3-bucket">S3 Bucket (Storage)</option>
+                        <option value="ec2-instance">EC2 Instance (Compute)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Resource Name <span class="required">*</span></label>
+                    <input type="text" id="resource-name" class="form-input" placeholder="my-app-storage" required pattern="[a-z0-9-]+">
+                    <p class="form-help">Lowercase letters, numbers, and hyphens only</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Environment <span class="required">*</span></label>
+                        <select id="environment" class="form-select" required>
+                            <option value="development">Development</option>
+                            <option value="staging">Staging</option>
+                            <option value="production">Production</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">AWS Region <span class="required">*</span></label>
+                        <select id="aws-region" class="form-select" required>
+                            <option value="us-east-1">US East (N. Virginia)</option>
+                            <option value="us-west-2">US West (Oregon)</option>
+                            <option value="eu-west-1">EU (Ireland)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- S3 Bucket Options -->
+                <div id="s3-options" class="resource-options">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin: 1.5rem 0 1rem; color: var(--gray-800);">S3 Bucket Options</h3>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="versioning-enabled" checked> Enable Versioning
+                        </label>
+                        <p class="form-help">Keep multiple versions of objects for recovery</p>
+                    </div>
+                </div>
+
+                <!-- EC2 Instance Options -->
+                <div id="ec2-options" class="resource-options">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin: 1.5rem 0 1rem; color: var(--gray-800);">EC2 Instance Options</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Instance Type</label>
+                            <select id="instance-type" class="form-select">
+                                <option value="t3.micro">t3.micro (1 vCPU, 1 GB RAM)</option>
+                                <option value="t3.small">t3.small (2 vCPU, 2 GB RAM)</option>
+                                <option value="t3.medium">t3.medium (2 vCPU, 4 GB RAM)</option>
+                                <option value="t3.large">t3.large (2 vCPU, 8 GB RAM)</option>
+                                <option value="t3.xlarge">t3.xlarge (4 vCPU, 16 GB RAM)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Storage Size (GB)</label>
+                            <input type="number" id="storage-size" class="form-input" value="30" min="8" max="1000">
+                            <p class="form-help">Root volume size in GB (8-1000)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        Submit Request
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Powered by <a href="https://github.com/AlqattanDev/terraform-workflow-aws" target="_blank">Terraform Workflow AWS</a></p>
+        <p>Requests create GitHub Pull Requests for review before deployment</p>
+    </footer>
+
+    <script>
+        // Generate ticket ID
+        function generateTicketId() {
+            const num = Math.floor(Math.random() * 9000000) + 1000000;
+            return `REQ${num}`;
+        }
+
+        // Initialize
+        document.getElementById('ticket-id').value = generateTicketId();
+
+        // Show/hide resource-specific options
+        document.getElementById('resource-type').addEventListener('change', function() {
+            document.querySelectorAll('.resource-options').forEach(el => el.classList.remove('active'));
+
+            if (this.value === 's3-bucket') {
+                document.getElementById('s3-options').classList.add('active');
+            } else if (this.value === 'ec2-instance') {
+                document.getElementById('ec2-options').classList.add('active');
+            }
+        });
+
+        // Show alert
+        function showAlert(type, message) {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 10000);
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('request-form').reset();
+            document.getElementById('ticket-id').value = generateTicketId();
+            document.querySelectorAll('.resource-options').forEach(el => el.classList.remove('active'));
+            document.getElementById('alert-container').innerHTML = '';
+        }
+
+        // Submit form
+        document.getElementById('request-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const token = document.getElementById('github-token').value;
+            if (!token) {
+                showAlert('error', 'Please enter your GitHub Personal Access Token');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner"></div> Submitting...';
+
+            const resourceType = document.getElementById('resource-type').value;
+
+            const payload = {
+                ref: 'main',
+                inputs: {
+                    ticket_id: document.getElementById('ticket-id').value,
+                    resource_type: resourceType,
+                    resource_name: document.getElementById('resource-name').value,
+                    environment: document.getElementById('environment').value,
+                    aws_region: document.getElementById('aws-region').value,
+                    requested_by: document.getElementById('requested-by').value,
+                    versioning_enabled: document.getElementById('versioning-enabled').checked ? 'true' : 'false',
+                    instance_type: document.getElementById('instance-type').value,
+                    storage_size: document.getElementById('storage-size').value
+                }
+            };
+
+            try {
+                const response = await fetch(
+                    'https://api.github.com/repos/AlqattanDev/terraform-workflow-aws/actions/workflows/process-request.yml/dispatches',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                if (response.status === 204) {
+                    const ticketId = document.getElementById('ticket-id').value;
+                    showAlert('success', `
+                        <strong>Request Submitted Successfully!</strong><br><br>
+                        Ticket ID: <span class="ticket-number">${ticketId}</span><br><br>
+                        A Pull Request will be created shortly.
+                        <a href="https://github.com/AlqattanDev/terraform-workflow-aws/pulls" target="_blank">View Pull Requests</a>
+                    `);
+
+                    // Generate new ticket ID for next request
+                    document.getElementById('ticket-id').value = generateTicketId();
+                } else {
+                    const error = await response.json();
+                    showAlert('error', `Failed to submit request: ${error.message || response.statusText}`);
+                }
+            } catch (error) {
+                showAlert('error', `Network error: ${error.message}`);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit Request';
+        });
+    </script>
+</body>
+</html>
